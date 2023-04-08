@@ -1,8 +1,10 @@
-use std::ops::{Add, Div, Mul, Sub, Neg};
+use std::ops::{Add, Div, Mul, Sub, Neg, AddAssign};
+
+use crate::constants::EPSILON;
 
 pub type Real = f32;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vec3(pub Real, pub Real, pub Real);
 
 pub type Point = Vec3;
@@ -24,6 +26,14 @@ impl Add for Vec3 {
     }
 }
 
+impl AddAssign for Vec3 {
+    fn add_assign(&mut self, rhs: Self) {
+        self.0 += rhs.0;
+        self.1 += rhs.1;
+        self.2 += rhs.2;
+    }
+}
+
 impl Div<Real> for Vec3 {
     type Output = Self;
 
@@ -40,6 +50,14 @@ impl Mul<Vec3> for Real {
     }
 }
 
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)
+    }
+}
+
 impl Neg for Vec3 {
     type Output = Self;
 
@@ -51,6 +69,20 @@ impl Neg for Vec3 {
 impl Vec3 {
     pub fn zero() -> Self {
         Vec3(0.0, 0.0, 0.0)
+    }
+
+    pub fn random() -> Self {
+        Self(rand::random::<Real>(), rand::random::<Real>(), rand::random::<Real>())
+    }
+
+    pub fn unit_sphere() -> Self {
+        loop {
+            let point = Self::random();
+
+            if point.length2() <= 1.0 {
+                break point;
+            }
+        }
     }
 
     pub fn dot(&self, other: &Self) -> Real {
@@ -67,6 +99,14 @@ impl Vec3 {
 
     pub fn normalized(&self) -> Self {
         *self / self.length()
+    }
+
+    pub fn is_perpendicular_to(&self, other: &Self) -> bool {
+        self.dot(other) < EPSILON
+    }
+
+    pub fn is_near_zero(&self) -> bool {
+        self.x().abs() < EPSILON && self.y().abs() < EPSILON && self.z().abs() < EPSILON
     }
 
     pub fn x(&self) -> Real { self.0 }

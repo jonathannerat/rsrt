@@ -1,13 +1,15 @@
 use std::ops::Range;
+use std::rc::Rc;
 
 use super::{HitRecord, Hittable};
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Point, Real};
 
-#[derive(Debug)]
 pub struct Sphere {
     pub center: Point,
     pub radius: Real,
+    pub material: Rc<dyn Material>,
 }
 
 impl Hittable for Sphere {
@@ -32,6 +34,7 @@ impl Hittable for Sphere {
                     &ray,
                     root,
                     (point - self.center) / self.radius,
+                    Some(&self.material)
                 ))
             } else {
                 None

@@ -16,7 +16,7 @@ impl Hittable for List<'_> {
         for object in &self.objects {
             if let Some(rec) = object.hit(ray, &t_interval) {
                 t_interval = t_interval.start..rec.t;
-                hit_record = Some(HitRecord::new(ray, rec.t, rec.normal));
+                hit_record = Some(HitRecord::new(ray, rec.t, rec.normal, rec.material.as_ref()));
             }
         }
 
